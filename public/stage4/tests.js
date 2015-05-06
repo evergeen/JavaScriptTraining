@@ -1,3 +1,4 @@
+(function(){
 'use strict';
 
 describe('ステージ4（意図通りにイベントを利用できる）', function() {
@@ -23,7 +24,10 @@ describe('ステージ4（意図通りにイベントを利用できる）', fun
       // });
       //
       // ここに上記のどちらかのコードを記述してください。
-
+      var element = document.getElementById('firebrick');
+      element.addEventListener('click', function(){
+        this.textContent = Number(this.textContent) + 1;        
+      });
 
       var firebrick = document.getElementById('firebrick');
       firebrick.dispatchEvent(createClickEvent());
@@ -37,7 +41,14 @@ describe('ステージ4（意図通りにイベントを利用できる）', fun
     it('2 番の要素の click イベントで要素内の数字を 1 ずつ小さくできる', function() {
 
       // ここにコードを記述してください。
-
+      $('#chocolate').on('click', function(){
+        // thisにはターゲットのオブジェクトが入っている(jQueryオブジェクトは入っていない)
+        // this.textContent = Number(this.textContent) - 1;
+        // OR
+        // --this.textContent;
+        var $target = $(event.target);
+        $target.text(Number($target.text()) - 1);
+      });
 
       var chocolate = document.getElementById('chocolate');
       chocolate.dispatchEvent(createClickEvent());
@@ -51,7 +62,14 @@ describe('ステージ4（意図通りにイベントを利用できる）', fun
     it('3 番の要素の click イベントで要素を 10 度ずつ回転できる', function() {
 
       // ここにコードを記述してください。
-
+      var degree = 0;
+      // document.querySelector('mediumseagreen')
+      document.getElementsByClassName('mediumseagreen')[0]
+              .addEventListener('click', function(){
+                degree += 10;
+                this.style.transform = 'rotate(' + degree + 'deg)';
+                degree %= 360;
+              });
 
       var mediumseagreen = document.querySelector('.mediumseagreen');
       mediumseagreen.dispatchEvent(createClickEvent());
@@ -67,6 +85,16 @@ describe('ステージ4（意図通りにイベントを利用できる）', fun
     it('4 番の要素を入力された角度に回転できる', function() {
 
       // ここにコードを記述してください。
+      var element = document.querySelector('.turquoise');
+      var input = element.getElementsByTagName('input')[0];
+      // getElementsByTagNameの返り値はNodeList. arrayではないので注意。以下参考。
+      // http://www.atmarkit.co.jp/ait/articles/0805/08/news154.html
+      // console.log(Array.isArray(element.getElementsByTagName('input')));
+
+      input.addEventListener('change', function(){
+        var degree = this.value;
+        element.style.transform = 'rotate(' + degree + 'deg)';
+      });
 
 
       var turquoise = document.querySelector('.turquoise');
@@ -93,9 +121,12 @@ describe('ステージ4（意図通りにイベントを利用できる）', fun
       // なお、expect(steelblue).to.be.null は上記のテストの要件を満たして
       // いないので、正解ではありません。
 
-      var steelblue = document.querySelector('.steelblue');
-      expect(steelblue).to.have.property('textContent', '5 \uD83D\uDC33');
-      done();
+      // domを生成したことを知らせるイベントにバインドする. loadイベントだと画像の読み込みも待つ.
+      document.addEventListener('DOMContentLoaded', function(){
+        var steelblue = document.querySelector('.steelblue');
+        expect(steelblue).to.have.property('textContent', '5 \uD83D\uDC33');
+        done();
+      });
     });
   });
 });
@@ -139,3 +170,4 @@ function secret(str) {
     return String.fromCharCode(charCode);
   }).join('');
 }
+}());
